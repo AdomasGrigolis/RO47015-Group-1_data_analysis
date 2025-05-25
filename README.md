@@ -10,3 +10,6 @@ Default data folder is [data/](data/).
 **Note**: all functions here are overwriting in nature. Be careful with data.  
 
 **DO NOT REDISTRIBUTE OUTSIDE OF RO47015 COURSE**  
+
+## Statistical pipeline
+![Statistical pipeline](resources/statistical_pipeline.png)
