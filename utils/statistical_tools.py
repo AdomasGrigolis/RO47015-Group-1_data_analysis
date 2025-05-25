@@ -22,10 +22,13 @@ def compute_repeated_measures(df_long, measure):
         parametric=False
     )
 
+    group_stats = df_long.groupby('condition')[measure].agg(['mean', 'std']).reset_index()
+
     return {
-        'test': 'friedman + non-parametric pairwise',
         'stat_analysis': friedman,
-        'results': pairwise
+        'results': pairwise,
+        'test': 'friedman + non-parametric pairwise',
+        'group_stats': group_stats
     }
 
 def generate_qq_plots(data, measure, groupby_col='condition', data_dir=os.path.join(os.getcwd(), 'data')):
@@ -63,6 +66,10 @@ def save_results_to_excel(results_dict, data_dir=os.path.join(os.getcwd(), 'data
             if 'results' in result and isinstance(result['results'], pd.DataFrame):
                 result['results'].to_excel(writer, sheet_name=f"{label}_pairwise", index=False)
                 metadata.append({'Label': label, 'Test': 'Pairwise', 'Sheet': f"{label}_pairwise"})
+            # Save group stats
+            if 'group_stats' in result and isinstance(result['group_stats'], pd.DataFrame):
+                result['group_stats'].to_excel(writer, sheet_name=f"{label}_group_stats", index=False)
+                metadata.append({'Label': label, 'Test': 'Group Stats', 'Sheet': f"{label}_group_stats"})
         # Save metadata
         if metadata:
             pd.DataFrame(metadata).to_excel(writer, sheet_name="Metadata", index=False)
