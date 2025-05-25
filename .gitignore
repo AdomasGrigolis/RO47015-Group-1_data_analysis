@@ -1,0 +1,12 @@
+.vscode/
+.env
+data/
+.DS_Store
+old/
+dev/
+99/
+data/
+**/__pycache__/
+build/
+dist/
+*.egg-info/

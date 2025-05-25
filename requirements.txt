@@ -1,0 +1,9 @@
+numpy
+pandas
+matplotlib
+seaborn
+argparse
+statannotations
+pingouin
+scipy
+openpyxl

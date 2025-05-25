@@ -1,0 +1,65 @@
+import os, sys
+import seaborn as sns
+import matplotlib.pyplot as plt
+from statannotations.Annotator import Annotator
+
+def boxplot(data, measure, config, data_dir, annotations_dict=None, unique_id=0):
+    order = config.get('order', ['0', '1', '2'])
+    title = config.get('title', f'Boxplot of {measure}')
+    x_label = config.get('x_label', measure)
+    y_label = config.get('y_label', 'Condition')
+    palette = config.get('palette', 'Set2')
+    y_lim = config.get('y_lim', None)
+
+    file_title = title.replace(" ", "_") + "_" + str(unique_id)
+    directory = os.path.join(data_dir, 'plots')
+
+    plt.figure(figsize=(10, 6))
+    ax = sns.boxplot(
+        data=data,
+        x=measure,
+        y='condition',
+        palette=palette,
+        orient='h',
+        whis=[0, 100],
+        flierprops={"marker": "x", "markersize": 5},
+        order=order
+    )
+    sns.stripplot(
+        data=data,
+        x=measure,
+        y='condition',
+        color='black',
+        size=3,
+        jitter=True,
+        dodge=True,
+        alpha=0.5,
+        ax=ax,
+        order=order
+    )
+
+    # statannotations
+    if annotations_dict and hasattr(ax, 'annotate'):
+        present_conditions = set(data['condition'].unique())
+        pairs = [p for p in annotations_dict.keys() if p[0] in present_conditions and p[1] in present_conditions]
+        annotations = [annotations_dict[p] for p in pairs]
+        annotator = Annotator(ax, pairs, data=data, x=measure, y='condition', y_order=order, orient='h')
+        annotator.configure(test=None, text_format='star')
+        annotator.set_custom_annotations(annotations)
+        annotator.annotate()
+
+    ax.set_title(title)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    if y_lim:
+        ax.set_xlim(y_lim)
+
+    if 'condition_labels' in config:
+        ax.set_yticklabels([config['condition_labels'].get(str(l), str(l)) for l in ax.get_yticks()])
+    plt.tight_layout()
+
+    # Save plot
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    plt.savefig(f'{directory}/{file_title}.jpg', format='jpeg', dpi=600)
+    plt.close()
