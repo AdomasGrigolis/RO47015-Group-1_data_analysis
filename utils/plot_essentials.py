@@ -43,7 +43,7 @@ def boxplot(data, measure, config, data_dir, annotations_dict=None, unique_id=0)
         present_conditions = set(data['condition'].unique())
         pairs = [p for p in annotations_dict.keys() if p[0] in present_conditions and p[1] in present_conditions]
         annotations = [annotations_dict[p] for p in pairs]
-        annotator = Annotator(ax, pairs, data=data, x=measure, y='condition', y_order=order, orient='h')
+        annotator = Annotator(ax, pairs, data=data, x=measure, y='condition', order=order, orient='h')
         annotator.configure(test=None, text_format='star')
         annotator.set_custom_annotations(annotations)
         annotator.annotate()
