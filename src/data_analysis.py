@@ -13,15 +13,21 @@ if __name__ == '__main__':
 
     df_long = parse_core.parse_data(data_directory)
 
-    # Generate QQ plots (for normality checks)
-    task_time_qq_plot = statistical_tools.generate_qq_plots(df_long.copy(), 'time', data_dir=data_directory)
-    task_error_qq_plot = statistical_tools.generate_qq_plots(df_long.copy(), 'error', data_dir=data_directory)
+    # Shapiro-Wilk tests for normality
+    task_time_normality_cond = statistical_tools.check_normality_condition(df_long.copy(), 'time', alpha=0.01, data_dir=data_directory)
+    task_error_normality_cond = statistical_tools.check_normality_condition(df_long.copy(), 'error', alpha=0.01, data_dir=data_directory)
+    task_time_normality_res = statistical_tools.check_normality_residuals(df_long.copy(), 'time', alpha=0.01, data_dir=data_directory)
+    task_error_normality_res = statistical_tools.check_normality_residuals(df_long.copy(), 'error', alpha=0.01, data_dir=data_directory)
 
     # Statistical tests
-    task_time_results = statistical_tools.compute_repeated_measures(df_long.copy(), 'time')
-    task_error_results = statistical_tools.compute_repeated_measures(df_long.copy(), 'error')
+    task_time_results = statistical_tools.compute_repeated_measures(df_long.copy(), 'time', parametric=False)
+    task_error_results = statistical_tools.compute_repeated_measures(df_long.copy(), 'error', parametric=False)
 
     # Combine and save results
+    task_time_results['normality_res'] = task_time_normality_res
+    task_error_results['normality_res'] = task_error_normality_res
+    task_time_results['normality_cond'] = task_time_normality_cond
+    task_error_results['normality_cond'] = task_error_normality_cond
     results_dict = {
         'time': task_time_results,
         'error': task_error_results
