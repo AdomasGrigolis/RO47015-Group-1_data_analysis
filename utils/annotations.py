@@ -1,6 +1,6 @@
 import pandas as pd
 
-def extract_condition_annotations(results, condition_pairs=None, omnibus_alpha=0.05):
+def extract_condition_annotations(results, condition_pairs=None, omnibus_alpha=0.10):
     if 'results' not in results or not isinstance(results['results'], pd.DataFrame):
         return {}
 
@@ -33,7 +33,7 @@ def extract_condition_annotations(results, condition_pairs=None, omnibus_alpha=0
                 '****' if p_corr <= 1.00e-04 else
                 '***' if p_corr <= 1.00e-03 else
                 '**' if p_corr <= 1.00e-02 else
-                '*' if p_corr <= 10.00e-02 else
+                '*' if p_corr <= omnibus_alpha else
                 'ns'
             )
             annotations[(a, b)] = annotation
