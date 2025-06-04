@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 from statsmodels.formula.api import ols
 from cfg.plot_config import condition_labels
+import statsmodels.formula.api as smf
 
 def compute_repeated_measures(df_long, measure, parametric=False):
     friedman = pg.friedman(
@@ -32,6 +33,37 @@ def compute_repeated_measures(df_long, measure, parametric=False):
         'test': 'friedman + non-parametric pairwise',
         'group_stats': group_stats
     }
+
+def learning_curve(df_long, measure):
+    df_long['condition'] = df_long['condition'].astype(str).astype('category')
+    df_long['condition'] = df_long['condition'].cat.reorder_categories(
+        ['0', '1', '2'], ordered=True
+    )
+    df_long['trialID'] = df_long['trialID'].astype(str).astype('category')
+    df_long['trialID'] = df_long['trialID'].cat.set_categories(['1', '2', '3'], ordered=True)
+
+    model = smf.mixedlm(
+        formula=f"{measure} ~ trialID * condition",
+        data=df_long,
+        groups=df_long["participantID"],
+        re_formula="~trialID"
+    )
+
+    results = model.fit()
+
+    table_df = results.summary().tables[1]
+    
+    if not table_df.index.empty and table_df.index[0] != 0:
+        df = table_df.copy()
+        df.index.name = 'variable'
+    else:
+        print("Warning: could not save LM results with variable names.")
+        return table_df
+    
+    # Convert numeric columns
+    numeric_cols = df.select_dtypes(include=['object']).columns
+    df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors='ignore')
+    return df.reset_index()
 
 def generate_qq_plot_residuals(residuals, measure_name, data_dir=os.path.join(os.getcwd(), 'data')):
     plot_dir = os.path.join(data_dir, 'plots')
@@ -104,6 +136,10 @@ def save_results_to_excel(results_dict, data_dir=os.path.join(os.getcwd(), 'data
             if 'results' in result and isinstance(result['results'], pd.DataFrame):
                 result['results'].to_excel(writer, sheet_name=f"{label}_pairwise", index=False)
                 metadata.append({'Label': label, 'Test': 'Pairwise', 'Sheet': f"{label}_pairwise"})
+            # Save learning curve results
+            if 'learning_curve' in result and isinstance(result['learning_curve'], pd.DataFrame):
+                result['learning_curve'].to_excel(writer, sheet_name=f"{label}_learning_curve", index=False)
+                metadata.append({'Label': label, 'Test': 'Learning Curve', 'Sheet': f"{label}_learning_curve"})
             # Save group stats
             if 'group_stats' in result and isinstance(result['group_stats'], pd.DataFrame):
                 result['group_stats'].to_excel(writer, sheet_name=f"{label}_group_stats", index=False)

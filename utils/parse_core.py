@@ -22,8 +22,52 @@ def parse_data(data_dir=os.path.join(os.getcwd(), 'data')):
                 }
                 records.append(record)
     df_long = pd.DataFrame(records, columns=['participantID', 'condition', 'time', 'error'])
+    df_long = attach_trial_id(data_dir, df_long)
+    return df_long
+
+def attach_trial_id(data_dir, df_long):
+    order_path = os.path.join(data_dir, 'other', 'order.xlsx')
+    order_df = pd.read_excel(order_path, skiprows=1)
+
+    # Ensure participantID is zero-padded strings in both dataframes
+    order_df['participantID'] = order_df['participantID'].apply(lambda x: str(x).zfill(2))
+    df_long['participantID'] = df_long['participantID'].apply(lambda x: str(x).zfill(2))
+
+    # Build mapping: participantID -> {mode: trial_number}
+    order_map = {}
+    for _, row in order_df.iterrows():
+        pid = str(row['participantID'])
+        mode_to_trial = {}
+        for i, cond_col in enumerate(['condA', 'condB', 'condC'], 1):
+            val = row[cond_col]
+            if pd.notna(val):
+                mode_to_trial[str(int(val))] = i
+        order_map[pid] = mode_to_trial
+
+    trial_id_list = []
+    for idx, row in df_long.iterrows():
+        pid = str(row['participantID'])
+        try:
+            cond = str(int(float(row['condition'])))
+        except Exception:
+            cond = str(row['condition'])
+        trial_id = order_map.get(pid, {}).get(cond, None)
+        trial_id_list.append(trial_id)
+    df_long['trialID'] = pd.Series(trial_id_list, dtype="Int64")
+    
+    # Warn about missing participants
+    data_pids = set(df_long['participantID'])
+    order_pids = set(order_map.keys())
+    missing_in_order = data_pids - order_pids
+    if missing_in_order:
+        print(f"Warning: These participantIDs are in your data but not in the order file: {sorted(missing_in_order)}")
+    extra_in_order = order_pids - data_pids
+    if extra_in_order:
+        print(f"Note: These participantIDs are in the order file but not in your data: {sorted(extra_in_order)}")
+
     return df_long
 
 if __name__ == "__main__":
     df_long = parse_data()
-    print(df_long.head())
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(df_long)
