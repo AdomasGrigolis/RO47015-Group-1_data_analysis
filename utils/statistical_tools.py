@@ -144,6 +144,7 @@ def save_results_to_excel(results_dict, data_dir=os.path.join(os.getcwd(), 'data
             if 'group_stats' in result and isinstance(result['group_stats'], pd.DataFrame):
                 result['group_stats'].to_excel(writer, sheet_name=f"{label}_group_stats", index=False)
                 metadata.append({'Label': label, 'Test': 'Group Stats', 'Sheet': f"{label}_group_stats"})
+            # Save normality results
             if 'normality_res' in result and isinstance(result['normality_res'], pd.DataFrame):
                 result['normality_res'] = result['normality_res'].reset_index()
                 result['normality_res'].to_excel(writer, sheet_name=f"{label}_normality_residuals", index=False)
