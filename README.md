@@ -48,7 +48,7 @@ There is a provided script that can check validity of data (with some limitation
 Simple things in plots can be adjusted through [plot_config.py](cfg/plot_config.py), this includes axis labels, title etc. New configurations can be made and passed in [data_analysis.py](src/data_analysis.py) script. For more complex changes, they may need to be applied in plotting functions themselves in [plot_essentials.py](utils/plot_essentials.py)
 
 ## Data
-The data is provided together with this repository in `data` branch. The provided `.zip` file can be extracted into the repository and will produce results as per our paper.
+The data is provided together with this repository in public release. The provided `.zip` file can be extracted into the repository and will produce results as per our paper. **Note that** the dataset has a different license than the code repository.
 
 ## Statistical pipeline
 ![Statistical pipeline](resources/statistical_pipeline.png)
