@@ -1,4 +1,4 @@
-import os, sys
+import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 from statannotations.Annotator import Annotator
@@ -41,12 +41,17 @@ def boxplot(data, measure, config, data_dir, annotations_dict=None, unique_id=0)
     # statannotations
     if annotations_dict and hasattr(ax, 'annotate'):
         present_conditions = set(data['condition'].unique())
-        pairs = [p for p in annotations_dict.keys() if p[0] in present_conditions and p[1] in present_conditions]
+        pairs = [p for p in annotations_dict.keys() 
+                 if p[0] in present_conditions
+                 and p[1] in present_conditions
+                 and annotations_dict[p] != 'ns'
+                 ]
         annotations = [annotations_dict[p] for p in pairs]
-        annotator = Annotator(ax, pairs, data=data, x=measure, y='condition', order=order, orient='h')
-        annotator.configure(test=None, text_format='star')
-        annotator.set_custom_annotations(annotations)
-        annotator.annotate()
+        if pairs:
+            annotator = Annotator(ax, pairs, data=data, x=measure, y='condition', order=order, orient='h')
+            annotator.configure(test=None, text_format='star')
+            annotator.set_custom_annotations(annotations)
+            annotator.annotate()
 
     ax.set_title(title)
     ax.set_xlabel(x_label)
