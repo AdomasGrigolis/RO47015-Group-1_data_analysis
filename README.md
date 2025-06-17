@@ -1,5 +1,5 @@
 # RO47015-Group-1_data_analysis
-This is a code repository for RO47015 course at TUDelft made in 2025 for HRI experiment which compares haptic and visual assistance in boom crane operation task. The primary purpose of the data analysis pipeline is to investigate between-condition effects. The experiment is within-subject design.  
+This is a code repository for RO47015 course at Delft University of Technology made in 2025 for physical human robot interaction (pHRI) experiment which compares haptic and visual assistance in boom crane operation task. The primary purpose of the data analysis pipeline is to investigate between-condition effects. The experiment is within-subject design.  
 
 The main [data_analysis](src/data_analysis.py) can be run using:
 
@@ -21,7 +21,7 @@ Default data folder is [./data/](data/). If data folder is passed with `-d` flag
 data/  
 ├── json_logs/  
 │   ├── excluded/  
-│   |   └── ...  
+│   │   └── ...  
 │   ├── 01_0_20250101.json  
 │   ├── 01_1_20250101.json  
 │   └── ...  
@@ -47,7 +47,8 @@ There is a provided script that can check validity of data (with some limitation
 ## Plot configuration
 Simple things in plots can be adjusted through [plot_config.py](cfg/plot_config.py), this includes axis labels, title etc. New configurations can be made and passed in [data_analysis.py](src/data_analysis.py) script. For more complex changes, they may need to be applied in plotting functions themselves in [plot_essentials.py](utils/plot_essentials.py)
 
-**DO NOT REDISTRIBUTE OUTSIDE OF RO47015 COURSE FOR NOW.**  
+## Data
+The data is provided together with this repository in `data` branch. The provided `.zip` file can be extracted into the repository and will produce results as per our paper.
 
 ## Statistical pipeline
 ![Statistical pipeline](resources/statistical_pipeline.png)
