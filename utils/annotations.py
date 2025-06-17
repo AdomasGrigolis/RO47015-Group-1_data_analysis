@@ -1,6 +1,6 @@
 import pandas as pd
 
-def extract_condition_annotations(results, condition_pairs=None, omnibus_alpha=0.10):
+def extract_condition_annotations(results, condition_pairs=None, omnibus_alpha=0.05):
     if 'results' not in results or not isinstance(results['results'], pd.DataFrame):
         return {}
 
